@@ -5,27 +5,23 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
-
-import org.junit.BeforeClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeTest;
 
 import com.bayamp.generic.Constants;
 
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
-import io.restassured.specification.RequestSpecification;
 
 public class BaseApiTest {
-	protected Properties prop;
-	protected String token;
-	protected RequestSpecification httpReq;
+	static Properties prop;
+	static String token;	
 	Response response;
 
 	@BeforeTest
 	public void init() {
 		loadPropertiesFile();
-		RestAssured.baseURI = "https://bayamp-rest-api-contacts.herokuapp.com";
-		httpReq = RestAssured.given();
+		RestAssured.baseURI = "https://bayamp-rest-api-contacts.herokuapp.com";		
 
 	}
 
