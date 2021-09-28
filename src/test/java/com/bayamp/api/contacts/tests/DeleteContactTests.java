@@ -1,5 +1,33 @@
 package com.bayamp.api.contacts.tests;
 
-public class DeleteContactTests {
+import org.testng.Assert;
+import org.testng.annotations.Test;
+
+import com.bayamp.utilities.RandomUtils;
+
+public class DeleteContactTests extends BaseApiTest {
+
+	@Test(dataProviderClass = Dataprovider.class, dataProvider = "getContactData")
+	public void validateDeleteContact(String name, String phone) {
+
+		response = ContactService.createContact(name, phone);
+		String id = response.path("id");
+
+		response = ContactService.deleteContact(id);
+		Assert.assertEquals(response.statusCode(), 204);
+
+		response = ContactService.getContact(id);
+		Assert.assertEquals(response.statusCode(), 404);
+	}
+
+	@Test
+	public void validateInvalidDeleteContact() {
+		
+		String id = String.valueOf(RandomUtils.generateRandomId());
+		response = ContactService.deleteContact(id);
+		// should it give 500 error? if invalid id is sent in delete
+		Assert.assertEquals(response.statusCode(), 500);
+
+	}
 
 }

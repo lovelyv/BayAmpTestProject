@@ -1,62 +1,70 @@
 package com.bayamp.api.contacts.tests;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
-import org.json.simple.JSONObject;
 import org.testng.Assert;
 import org.testng.Reporter;
 import org.testng.annotations.Test;
+import org.testng.asserts.SoftAssert;
 
 import com.bayamp.generic.Constants;
-import com.bayamp.utilities.RandomUtils;
-import com.bayamp.utilities.RegexUtils;
 
-import io.restassured.RestAssured;
-import io.restassured.http.Method;
-import io.restassured.module.jsv.JsonSchemaValidationException;
 import io.restassured.module.jsv.JsonSchemaValidator;
-import io.restassured.path.json.JsonPath;
-import io.restassured.response.Response;
 
 public class GetContactstests extends BaseApiTest {
-
-	@Test
-	public void validateGetAllContactsSchema() {
-		try {
-			File jsonfile = new File(prop.getProperty(Constants.JSON_GETALLCONTACTS_SCHEMAFILE_LOCATION));
-			response = ContactService.getAllContacts();
-			response.then().assertThat().body(JsonSchemaValidator.matchesJsonSchema(jsonfile));
-
-		} catch (AssertionError e) {
-			Reporter.log(e.getMessage());
-		}
-	}
+	SoftAssert sAssert = new SoftAssert();
 
 	@Test
 	public void validateGetAllContactsResponse() {
 
-		response = ContactService.getAllContacts();
-		List<Map<String, String>> allContacts = response.jsonPath().getList("$");
-		for (Map<String, String> c : allContacts) {
-			System.out.println(c.get("name"));
-			System.out.println(c.get("phone"));
+		File jsonfile = new File(Propertymanager.getProperty(Constants.JSON_GETALLCONTACTS_SCHEMAFILE_LOCATION));
+		int page = 1;
+		int count = 1;
+		List<Map<String, String>> allContacts = new ArrayList<Map<String, String>>();
+		List<Map<String, String>> pageList = new ArrayList<Map<String, String>>();
+		// loop through all the pages existing for the response
+		while (count > 0) {
+			response = ContactService.getAllContacts(page);
+
+			// this gets the entire response as a list
+			pageList = response.jsonPath().getList("$");
+			for (Map<String, String> row : pageList) {
+				String phone = row.get("phone");
+				sAssert.assertNotNull(phone, "The Phone no is not present for " + row.get("id"));
+				if (phone != null) {
+
+					sAssert.assertTrue(phone.length() == 10, "phone length is " + phone.length()
+							+ " which is less than 10 digits for " + row.get("id"));
+				}
+			}
+			
+			// ArrayList<String> phoneNo = response.then().extract().path("phone");
+			// System.out.println(response.then().extract().headers());
+			response.then().assertThat().body(JsonSchemaValidator.matchesJsonSchema(jsonfile)).log();
+			// response.then().assertThat().statusCode(201);
+			sAssert.assertEquals(response.getStatusCode(), 200);
+			sAssert.assertEquals(response.getContentType(), "application/json; charset=utf-8");
+			
+			count = pageList.size();
+			allContacts.addAll(pageList);
+			page++;
 		}
+		sAssert.assertAll();
+
 		System.out.println("Total contacts received is " + allContacts.size());
 
-		System.out.println(response.jsonPath().getString("name"));
-
-		List<String> contacts = response.jsonPath().getList("phone");
-
+		// json path can be used to read the list of values of one type of key, eg name
+		// here
+		// System.out.println(response.jsonPath().getString("name"));
+		// List<String> contacts = response.jsonPath().getList("phone");
 		// use list of map, for jsonarrays ,
 		// https://devqa.io/parse-json-response-rest-assured/
 		// List<Map<String, String>> companies = response.jsonPath().getList("company");
-		System.out.println(contacts.get(0));
-		// JSONArray contacts = JSONParser.p
+		// System.out.println(contacts.get(0));
 
 	}
-
 
 }
