@@ -11,28 +11,29 @@ import org.testng.annotations.Test;
 import org.testng.asserts.SoftAssert;
 
 import com.bayamp.generic.Constants;
+import com.bayamp.utilities.ContactServiceUtils;
 
 import io.restassured.module.jsv.JsonSchemaValidator;
 
-public class GetContactstests extends BaseApiTest {
+public class GetContactsTests extends BaseApiTest {
 	SoftAssert sAssert = new SoftAssert();
 
 	@Test
 	public void validateGetAllContactsResponse() {
 
-		File jsonfile = new File(Propertymanager.getProperty(Constants.JSON_GETALLCONTACTS_SCHEMAFILE_LOCATION));
+		File jsonfile = new File(PropertyManager.getProperty(Constants.JSON_GETALLCONTACTS_SCHEMAFILE_LOCATION));
 		int page = 1;
 		int count = 1;
-		List<Map<String, String>> allContacts = new ArrayList<Map<String, String>>();
-		List<Map<String, String>> pageList = new ArrayList<Map<String, String>>();
+		List<Map<String, Object>> allContacts = new ArrayList<Map<String, Object>>();
+		List<Map<String, Object>> pageList = new ArrayList<Map<String, Object>>();
 		// loop through all the pages existing for the response
 		while (count > 0) {
-			response = ContactService.getAllContacts(page);
-
+			response = ContactServiceUtils.getAllContacts(page);
+			Assert.assertEquals(response.getStatusCode(), 200);
 			// this gets the entire response as a list
 			pageList = response.jsonPath().getList("$");
-			for (Map<String, String> row : pageList) {
-				String phone = row.get("phone");
+			for (Map<String, Object> row : pageList) {
+				String phone = (String) row.get("phone");
 				sAssert.assertNotNull(phone, "The Phone no is not present for " + row.get("id"));
 				if (phone != null) {
 

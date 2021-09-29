@@ -10,7 +10,7 @@ public class BaseApiTest {
 
 	@BeforeClass
 	public void init() {
-		Propertymanager.setProperties();
+		PropertyManager.setProperties();
 	}
 
 }

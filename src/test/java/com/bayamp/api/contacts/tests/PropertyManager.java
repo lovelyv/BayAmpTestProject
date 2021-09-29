@@ -8,7 +8,7 @@ import java.util.Properties;
 
 import com.bayamp.generic.Constants;
 
-public class Propertymanager {
+public class PropertyManager {
 	private static Properties prop;
 
 	public static void setProperties() {

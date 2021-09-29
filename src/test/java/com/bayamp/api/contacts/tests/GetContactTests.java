@@ -3,6 +3,8 @@ package com.bayamp.api.contacts.tests;
 import org.testng.annotations.Test;
 import org.testng.asserts.SoftAssert;
 
+import com.bayamp.utilities.ContactServiceUtils;
+
 import io.restassured.path.json.JsonPath;
 
 public class GetContactTests extends BaseApiTest {
@@ -11,10 +13,10 @@ public class GetContactTests extends BaseApiTest {
 	@Test(dataProviderClass = Dataprovider.class, dataProvider = "getContactData")
 	public void validateContact(String name, String phone) {
 
-		response = ContactService.createContact(name, phone);
+		response = ContactServiceUtils.createContact(name, phone);
 		String id = response.jsonPath().getString("id");
 		
-		response = ContactService.getContact(id);
+		response = ContactServiceUtils.getContact(id);
 		
 		JsonPath jPath = response.jsonPath();
 		sf.assertEquals(name, jPath.get("name"));

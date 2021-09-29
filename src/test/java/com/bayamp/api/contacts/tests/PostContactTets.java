@@ -8,6 +8,7 @@ import org.testng.Reporter;
 import org.testng.annotations.Test;
 
 import com.bayamp.generic.Constants;
+import com.bayamp.utilities.ContactServiceUtils;
 import com.bayamp.utilities.RegexUtils;
 
 import io.restassured.module.jsv.JsonSchemaValidationException;
@@ -19,8 +20,8 @@ public class PostContactTets extends BaseApiTest {
 	@Test(dataProviderClass = Dataprovider.class, dataProvider = "getContactData")
 	public void testCreateContact(String name, String phoneno) {
 
-		File jsonfile = new File(Propertymanager.getProperty(Constants.JSON_POST_CONTACT_SCHEMA_LOCATION));
-		response = ContactService.createContact(name, phoneno) ;
+		File jsonfile = new File(PropertyManager.getProperty(Constants.JSON_POST_CONTACT_SCHEMA_LOCATION));
+		response = ContactServiceUtils.createContact(name, phoneno) ;
 		Assert.assertEquals(response.getStatusCode(), 201, "Invalid response code");
 
 		String statusMsg = response.getStatusLine();
